@@ -4,7 +4,7 @@ from database import *
 import os
 
 #token from @BotFather
-bot = telebot.TeleBot("5866408202:AAEo57T2Q8Tc9kP2GAe2AHHauUvn27Kot3o")
+bot = telebot.TeleBot("")
 
 class User:  
     def __init__(self, user_id):
