@@ -39,7 +39,26 @@ function setting(){
     $id = $message['from']['id'];
     $db = new SQLite3("users.db");
     @$db->query("insert into users values ({$id}, 0, 0)");
-    Bot::sendMessage("Set your gender");
+    $data = array();
+    
+    /***
+    $data['reply_markup'] = array(
+    "inline_keyboard" => array(
+        array(
+            array(
+                "text" => "I am male ♂️",
+                "callback_data" => "1"
+            ),
+            array(
+                "text" => "I am female ♀️",
+                "callback_data" => "2"
+            )
+        )
+    ));
+    ***/
+    
+    Bot::sendMessage("No need set your gender", $data);
+    
     return 0;
 }
 
@@ -100,12 +119,17 @@ $bot->cmd('*', function($text){
     if ($companion > 0){       
         if (is_string($text)){
             Bot::sendMessage($text, $data);
-        } 
+        }
+        
+        $sticker = $message['sticker']['file_id'];
+        Bot::sendSticker($sticker, $data);
     }
     return 0;
 });
 
 $bot->on('*', function($sticker){
+    $sticker = 0;
+    
     $message = Bot::message();
     $id = $message['from']['id'];  
     $db = new SQLite3("users.db");
@@ -113,7 +137,7 @@ $bot->on('*', function($sticker){
     $data['chat_id'] = $companion;
     
     if ($companion > 0){
-        $sticker = $message['sticker']['file_id'];
+        @$sticker = $message['sticker']['file_id'];
         Bot::sendSticker($sticker, $data);
     }
     return 0;
