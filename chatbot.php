@@ -15,8 +15,8 @@ $bot->cmd('/search', function() {
 });
 
 $bot->cmd('/next', function() {
-    stop();
-    search();
+    stop(1);
+    search(1);
     return 0;
 });
 
@@ -50,7 +50,7 @@ function setting(){
     return 0;
 }
 
-function stop(){
+function stop($params = 0){
     $message = Bot::message();  
     $db = new SQLite3("users.db");
     
@@ -61,17 +61,21 @@ function stop(){
         $data['chat_id'] = $companion;
         $db->query("update users set status = 0, companion = 0 where id = {$id}");
         $db->query("update users set status = 0, companion = 0  where id = {$companion}");
-    
-        Bot::sendMessage("You stopped the dialog 🙄 \nType /search to find a new partner");
+        
+        if ($params > 0){
+            Bot::sendMessage("You stopped the dialog. Searching for a new partner...");
+        } else {
+            Bot::sendMessage("You stopped the dialog 🙄 \nType /search to find a new partner");
+        }
         Bot::sendMessage("Your partner has stopped the dialog 😞 \nType /search to find a new partner", $data);
-    } else {
-        //this
+    }
+    if($params < 1){
         Bot::sendMessage("You have no partner 🤔 \nType /search to find a new partner");
     }
     return 0;
 }
 
-function search(){
+function search($params = 0){
     $message = Bot::message();
     $db = new SQLite3("users.db");
     
@@ -90,7 +94,9 @@ function search(){
             Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog");
             Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog", $data);
         } else {
-            Bot::sendMessage("Looking for a partner...");
+            if($params < 1){
+                Bot::sendMessage("Looking for a partner...");
+            }
         }
     } else {
         Bot::sendMessage("You are in the dialog right now 🤔 \n/next — find a new partner \n/stop — stop this dialog");
