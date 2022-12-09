@@ -46,7 +46,7 @@ function setting(){
     }
     $data = array();
     
-    Bot::sendMessage("No need set your gender", $data);
+    Bot::sendMessage("No need set your gender 😉", $data);
     return 0;
 }
 
@@ -103,7 +103,6 @@ function search($params = 0){
     }
     return 0;
 }
-
 
 $bot->cmd('*', function($text){
     $message = Bot::message();
