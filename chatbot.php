@@ -95,10 +95,8 @@ function search($params = 0){
             
             Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog");
             Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog", $data);
-        } else {
-            if($params < 1){
-                Bot::sendMessage("Looking for a partner...");
-            }
+        } else if($params < 1){
+            Bot::sendMessage("Looking for a partner...");
         }
     } else {
         Bot::sendMessage("You are in the dialog right now 🤔 \n/next — find a new partner \n/stop — stop this dialog");
