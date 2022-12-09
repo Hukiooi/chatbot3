@@ -1,2 +1,2 @@
 <?php
-$apiToken = "5866408202:AAEo57T2Q8Tc9kP2GAe2AHHauUvn27Kot3o";
+$apiToken = "";
