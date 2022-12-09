@@ -26,6 +26,7 @@ $bot->cmd('/stop', function() {
 });
 
 $bot->cmd('/help', function() {
+    #Bot::sendMessage("");
     return 0;
 });
 
@@ -45,24 +46,7 @@ function setting(){
     }
     $data = array();
     
-    /***
-    $data['reply_markup'] = array(
-    "inline_keyboard" => array(
-        array(
-            array(
-                "text" => "I am male ♂️",
-                "callback_data" => "1"
-            ),
-            array(
-                "text" => "I am female ♀️",
-                "callback_data" => "2"
-            )
-        )
-    ));
-    ***/
-    
     Bot::sendMessage("No need set your gender", $data);
-    
     return 0;
 }
 
@@ -91,21 +75,25 @@ function search(){
     $message = Bot::message();
     $db = new SQLite3("users.db");
     
-    Bot::sendMessage("Looking for a partner...");
-    
     $id = $message['from']['id'];
-    $db->query("update users set status = 1 where id = {$id}");
-    
-    $results = $db->querySingle("select id from users where status = 1 and id != {$id} limit 1");
-    $companion = $results;
-    
-    if($companion > 0){        
-        $data['chat_id'] = $companion;
-        $db->query("update users set status = 2, companion = {$companion} where id = {$id}");
-        $db->query("update users set status = 2, companion = {$id} where id = {$companion}");
+    $check_companion = $db->querySingle("select companion from users where status = 2 and id = {$id} limit 1");
+    if($check_companion < 1){
+        Bot::sendMessage("Looking for a partner...");
         
-        Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog");
-        Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog", $data);
+        $db->query("update users set status = 1 where id = {$id}");
+        $results = $db->querySingle("select id from users where status = 1 and id != {$id} limit 1");
+        $companion = $results;
+        
+        if($companion > 0){        
+            $data['chat_id'] = $companion;
+            $db->query("update users set status = 2, companion = {$companion} where id = {$id}");
+            $db->query("update users set status = 2, companion = {$id} where id = {$companion}");
+            
+            Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog");
+            Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog", $data);
+        }
+    } else {
+        Bot::sendMessage("Not permitted");
     }
     return 0;
 }
@@ -136,7 +124,7 @@ $bot->on('*', function($sticker){
     $data['chat_id'] = $companion;
     
     if ($companion > 0){
-        @$sticker = $message['sticker']['file_id'];
+        $sticker = $message['sticker']['file_id'];
         Bot::sendSticker($sticker, $data);
     }
     return 0;
