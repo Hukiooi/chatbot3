@@ -38,7 +38,11 @@ function setting(){
     $message = Bot::message();
     $id = $message['from']['id'];
     $db = new SQLite3("users.db");
-    @$db->query("insert into users values ({$id}, 0, 0)");
+    $checkid = $db->querySingle("select id from users where id = {$id}");
+    
+    if(empty($checkid) or $checkid < 1){
+        $db->query("insert into users values ({$id}, 0, 0)");
+    }
     $data = array();
     
     /***
@@ -71,17 +75,15 @@ function stop(){
     
     if($companion > 0){
         $data['chat_id'] = $companion;
-        
+        $db->query("update users set status = 0, companion = 0 where id = {$id}");
+        $db->query("update users set status = 0, companion = 0  where id = {$companion}");
+    
         Bot::sendMessage("You stopped the dialog 🙄 \nType /search to find a new partner");
         Bot::sendMessage("Your partner has stopped the dialog 😞 \nType /search to find a new partner", $data);
     } else {
         
         Bot::sendMessage("You have no partner 🤔 \nType /search to find a new partner");
     }
-    
-    $db->query("update users set status = 0, companion = 0 where id = {$id}");
-    $db->query("update users set status = 0, companion = 0  where id = {$companion}");
-    
     return 0;
 }
 
@@ -120,9 +122,6 @@ $bot->cmd('*', function($text){
         if (is_string($text)){
             Bot::sendMessage($text, $data);
         }
-        
-        $sticker = $message['sticker']['file_id'];
-        Bot::sendSticker($sticker, $data);
     }
     return 0;
 });
