@@ -93,7 +93,7 @@ function search(){
             Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog", $data);
         }
     } else {
-        Bot::sendMessage("Not permitted");
+        Bot::sendMessage("You are in the dialog right now 🤔 \n/next — find a new partner \n/stop — stop this dialog");
     }
     return 0;
 }
