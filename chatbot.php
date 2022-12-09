@@ -26,7 +26,9 @@ $bot->cmd('/stop', function() {
 });
 
 $bot->cmd('/help', function() {
-    #Bot::sendMessage("");
+    $data['parse_mode'] = "markdown";
+    $data['disable_web_page_preview'] = true;
+    Bot::sendMessage("_source code: (https://github.com/Hukiooi/chatbot3)_", $data);
     return 0;
 });
 
@@ -69,7 +71,7 @@ function stop($params = 0){
         }
         Bot::sendMessage("Your partner has stopped the dialog 😞 \nType /search to find a new partner", $data);
     }
-    if($params < 1){
+    if($params < 1 and $companion < 0){
         Bot::sendMessage("You have no partner 🤔 \nType /search to find a new partner");
     }
     return 0;
