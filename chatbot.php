@@ -65,7 +65,7 @@ function stop(){
         Bot::sendMessage("You stopped the dialog 🙄 \nType /search to find a new partner");
         Bot::sendMessage("Your partner has stopped the dialog 😞 \nType /search to find a new partner", $data);
     } else {
-        
+        //this
         Bot::sendMessage("You have no partner 🤔 \nType /search to find a new partner");
     }
     return 0;
@@ -78,8 +78,6 @@ function search(){
     $id = $message['from']['id'];
     $check_companion = $db->querySingle("select companion from users where status = 2 and id = {$id} limit 1");
     if($check_companion < 1){
-        Bot::sendMessage("Looking for a partner...");
-        
         $db->query("update users set status = 1 where id = {$id}");
         $results = $db->querySingle("select id from users where status = 1 and id != {$id} limit 1");
         $companion = $results;
@@ -91,6 +89,8 @@ function search(){
             
             Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog");
             Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog", $data);
+        } else {
+            Bot::sendMessage("Looking for a partner...");
         }
     } else {
         Bot::sendMessage("You are in the dialog right now 🤔 \n/next — find a new partner \n/stop — stop this dialog");
@@ -125,6 +125,22 @@ $bot->on('*', function($sticker){
     
     if ($companion > 0){
         $sticker = $message['sticker']['file_id'];
+        Bot::sendSticker($sticker, $data);
+    }
+    return 0;
+});
+
+$bot->on('*', function($voice){
+    $voice = 0;
+    
+    $message = Bot::message();
+    $id = $message['from']['id'];  
+    $db = new SQLite3("users.db");
+    $companion = $db->querySingle("select companion from users where id = {$id} and status = 2 limit 1");
+    $data['chat_id'] = $companion;
+    
+    if ($companion > 0){
+        $sticker = $message['voice']['file_id'];
         Bot::sendSticker($sticker, $data);
     }
     return 0;
