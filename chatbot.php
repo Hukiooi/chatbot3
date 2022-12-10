@@ -28,8 +28,9 @@ $bot->cmd('/stop', function() {
 $bot->cmd('/help', function() {
     $data['parse_mode'] = 'markdown';
     $data['disable_web_page_preview'] = true;
-    Bot::sendMessage("Do not use this bot for criminals! Buy me a coffee (Neobank), 5859459153969695");
+    Bot::sendMessage("This bot is for anonymous chatting with strangers in Telegram. Bot can send text, stickers \nDo not use this bot for criminals! Buy me a coffee (Neobank), 5859459153969695");
     Bot::sendMessage("_source code: (https://github.com/Hukiooi/chatbot3)_", $data);
+    
     return 0;
 });
 
@@ -122,9 +123,7 @@ $bot->cmd('*', function($text){
     return 0;
 });
 
-$bot->on('*', function($sticker){
-    $sticker = 0;
-    
+$bot->on('*', function($message){    
     $message = Bot::message();
     $id = $message['from']['id'];  
     $db = new SQLite3("users.db");
@@ -134,22 +133,6 @@ $bot->on('*', function($sticker){
     if ($companion > 0){
         $sticker = $message['sticker']['file_id'];
         Bot::sendSticker($sticker, $data);
-    }
-    return 0;
-});
-
-$bot->on('*', function($voice){
-    $voice = 0;
-    
-    $message = Bot::message();
-    $id = $message['from']['id'];  
-    $db = new SQLite3("users.db");
-    $companion = $db->querySingle("select companion from users where id = {$id} and status = 2 limit 1");
-    $data['chat_id'] = $companion;
-    
-    if ($companion > 0){
-        $voice = $message['voice']['file_id'];
-        Bot::sendVoice($voice, $data);
     }
     return 0;
 });
