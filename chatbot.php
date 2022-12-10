@@ -39,100 +39,132 @@ $bot->cmd('/setting', function() {
     return 0;
 });
 
-function setting(){
+function is_bloked(){
     $message = Bot::message();
     $id = $message['from']['id'];
-    $db = new SQLite3("users.db");
-    $checkid = $db->querySingle("select id from users where id = {$id}");
     
-    if(empty($checkid) or $checkid < 1){
-        $db->query("insert into users values ({$id}, 0, 0)");
+    $blocked = $db->querySingle("select blocked from users where id = {$id}");
+    if($blocked > 0){
+        return true;
+    } else {
+        return false;
     }
-    $data = array();
-    
-    Bot::sendMessage("No need set your gender 😉", $data);
+}
+
+function setting(){
+    if(is_blocked()){
+        echo "blocked user\n";
+    } else {
+        $message = Bot::message();
+        $id = $message['from']['id'];
+        $db = new SQLite3("users.db");
+        $checkid = $db->querySingle("select id from users where id = {$id}");
+        
+        if(empty($checkid) or $checkid < 1){
+            $db->query("insert into users values ({$id}, 0, 0, 0)");
+        }
+        $data = array();
+        
+        Bot::sendMessage("No need set your gender 😉", $data);
+    }
     return 0;
 }
 
 function stop($params = 0){
-    $message = Bot::message();  
-    $db = new SQLite3("users.db");
-    
-    $id = $message['from']['id'];
-    $companion = $db->querySingle("select companion from users where id = {$id}");
-    
-    if($companion > 0){
-        $data['chat_id'] = $companion;
-        $db->query("update users set status = 0, companion = 0 where id = {$id}");
-        $db->query("update users set status = 0, companion = 0  where id = {$companion}");
+    if(is_blocked()){
+        echo "blocked user\n";
+    } else {
+        $message = Bot::message();  
+        $db = new SQLite3("users.db");
         
-        if ($params > 0){
-            Bot::sendMessage("You stopped the dialog. Searching for a new partner...");
-        } else {
-            Bot::sendMessage("You stopped the dialog 🙄 \nType /search to find a new partner");
+        $id = $message['from']['id'];
+        $companion = $db->querySingle("select companion from users where id = {$id}");
+        
+        if($companion > 0){
+            $data['chat_id'] = $companion;
+            $db->query("update users set status = 0, companion = 0 where id = {$id}");
+            $db->query("update users set status = 0, companion = 0  where id = {$companion}");
+            
+            if ($params > 0){
+                Bot::sendMessage("You stopped the dialog. Searching for a new partner...");
+            } else {
+                Bot::sendMessage("You stopped the dialog 🙄 \nType /search to find a new partner");
+            }
+            Bot::sendMessage("Your partner has stopped the dialog 😞 \nType /search to find a new partner", $data);
         }
-        Bot::sendMessage("Your partner has stopped the dialog 😞 \nType /search to find a new partner", $data);
-    }
-    if($params < 1 and $companion < 1){
-        $db->query("update users set status = 0, companion = 0 where id = {$id}");
-        Bot::sendMessage("You have no partner 🤔 \nType /search to find a new partner");
+        if($params < 1 and $companion < 1){
+            $db->query("update users set status = 0, companion = 0 where id = {$id}");
+            Bot::sendMessage("You have no partner 🤔 \nType /search to find a new partner");
+        }
     }
     return 0;
 }
 
 function search($params = 0){
-    $message = Bot::message();
-    $db = new SQLite3("users.db");
-    
-    $id = $message['from']['id'];
-    $check_companion = $db->querySingle("select companion from users where status = 2 and id = {$id} limit 1");
-    if($check_companion < 1){
-        $db->query("update users set status = 1 where id = {$id}");
-        $results = $db->querySingle("select id from users where status = 1 and id != {$id} limit 1");
-        $companion = $results;
-        
-        if($companion > 0){        
-            $data['chat_id'] = $companion;
-            $db->query("update users set status = 2, companion = {$companion} where id = {$id}");
-            $db->query("update users set status = 2, companion = {$id} where id = {$companion}");
-            
-            Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog");
-            Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog", $data);
-        }
-        if($params < 1 and $companion < 1){
-            Bot::sendMessage("Looking for a partner...");
-        }
+    if(is_blocked()){
+        echo "blocked user\n";
     } else {
-        Bot::sendMessage("You are in the dialog right now 🤔 \n/next — find a new partner \n/stop — stop this dialog");
+        $message = Bot::message();
+        $db = new SQLite3("users.db");
+        
+        $id = $message['from']['id'];
+        $check_companion = $db->querySingle("select companion from users where status = 2 and id = {$id} limit 1");
+        if($check_companion < 1){
+            $db->query("update users set status = 1 where id = {$id}");
+            $results = $db->querySingle("select id from users where status = 1 and id != {$id} limit 1");
+            $companion = $results;
+            
+            if($companion > 0){        
+                $data['chat_id'] = $companion;
+                $db->query("update users set status = 2, companion = {$companion} where id = {$id}");
+                $db->query("update users set status = 2, companion = {$id} where id = {$companion}");
+                
+                Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog");
+                Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog", $data);
+            }
+            if($params < 1 and $companion < 1){
+                Bot::sendMessage("Looking for a partner...");
+            }
+        } else {
+            Bot::sendMessage("You are in the dialog right now 🤔 \n/next — find a new partner \n/stop — stop this dialog");
+        }
     }
     return 0;
 }
 
 $bot->cmd('*', function($text){
-    $message = Bot::message();
-    $id = $message['from']['id'];  
-    $db = new SQLite3("users.db");
-    $companion = $db->querySingle("select companion from users where id = {$id} and status = 2 limit 1");
-    $data['chat_id'] = $companion;
-    
-    if ($companion > 0){       
-        if (is_string($text)){
-            Bot::sendMessage($text, $data);
+    if(is_blocked()){
+        echo "blocked user\n";
+    } else {
+        $message = Bot::message();
+        $id = $message['from']['id'];  
+        $db = new SQLite3("users.db");
+        $companion = $db->querySingle("select companion from users where id = {$id} and status = 2 limit 1");
+        $data['chat_id'] = $companion;
+        
+        if ($companion > 0){       
+            if (is_string($text)){
+                Bot::sendMessage($text, $data);
+            }
         }
     }
     return 0;
 });
 
-$bot->on('*', function($message){    
-    $message = Bot::message();
-    $id = $message['from']['id'];  
-    $db = new SQLite3("users.db");
-    $companion = $db->querySingle("select companion from users where id = {$id} and status = 2 limit 1");
-    $data['chat_id'] = $companion;
-    
-    if ($companion > 0){
-        $sticker = $message['sticker']['file_id'];
-        Bot::sendSticker($sticker, $data);
+$bot->on('*', function($message){
+    if(is_blocked()){
+        echo "blocked user\n";
+    } else {
+        $message = Bot::message();
+        $id = $message['from']['id'];  
+        $db = new SQLite3("users.db");
+        $companion = $db->querySingle("select companion from users where id = {$id} and status = 2 limit 1");
+        $data['chat_id'] = $companion;
+        
+        if ($companion > 0){
+            $sticker = $message['sticker']['file_id'];
+            Bot::sendSticker($sticker, $data);
+        }
     }
     return 0;
 });
