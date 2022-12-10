@@ -42,7 +42,7 @@ $bot->cmd('/setting', function() {
 function is_blocked(){
     $message = Bot::message();
     $id = $message['from']['id'];
-    
+    $db = new SQLite3("users.db");
     $blocked = $db->querySingle("select blocked from users where id = {$id}");
     if($blocked > 0){
         return true;
