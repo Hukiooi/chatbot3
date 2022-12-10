@@ -26,6 +26,7 @@ $bot->cmd('/stop', function() {
 });
 
 $bot->cmd('/help', function() {
+    $data = array();
     $data['parse_mode'] = "markdown";
     $data['disable_web_page_preview'] = true;
     Bot::sendMessage("_source code: (https://github.com/Hukiooi/chatbot3)_", $data);
@@ -71,7 +72,7 @@ function stop($params = 0){
         }
         Bot::sendMessage("Your partner has stopped the dialog 😞 \nType /search to find a new partner", $data);
     }
-    if($params < 1 and $companion < 0){
+    if($params < 1 and $companion < 1){
         Bot::sendMessage("You have no partner 🤔 \nType /search to find a new partner");
     }
     return 0;
@@ -95,7 +96,8 @@ function search($params = 0){
             
             Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog");
             Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog", $data);
-        } else if($params < 1){
+        }
+        if($params < 1 and $companion < 1){
             Bot::sendMessage("Looking for a partner...");
         }
     } else {
@@ -145,8 +147,8 @@ $bot->on('*', function($voice){
     $data['chat_id'] = $companion;
     
     if ($companion > 0){
-        $sticker = $message['voice']['file_id'];
-        Bot::sendSticker($sticker, $data);
+        $voice = $message['voice']['file_id'];
+        Bot::sendVoice($voice, $data);
     }
     return 0;
 });
