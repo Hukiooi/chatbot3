@@ -39,7 +39,7 @@ $bot->cmd('/setting', function() {
     return 0;
 });
 
-function is_blocked(){
+function isBlocked(){
     $message = Bot::message();
     $id = $message['from']['id'];
     $db = new SQLite3("users.db");
@@ -57,10 +57,13 @@ function blockedMessage(){
 }
 
 function setting(){
-    if(is_blocked()){
+    if(isBlocked()){
         blockedMessage();
     } else {
         $message = Bot::message();
+        
+        $self['parse_mode'] = 'markdown';
+        
         $id = $message['from']['id'];
         $db = new SQLite3("users.db");
         $checkid = $db->querySingle("select id from users where id = {$id}");
@@ -68,8 +71,7 @@ function setting(){
         if(empty($checkid) or $checkid < 1){
             $db->query("insert into users values ({$id}, 0, 0, 0)");
         }
-        $self['parse_mode'] = 'markdown';
-        $self['disable_web_page_preview'] = true;
+        
         
         Bot::sendMessage("_No need set your gender 😉_", $self);
     }
@@ -77,10 +79,14 @@ function setting(){
 }
 
 function stop($params = 0){
-    if(is_blocked()){
+    if(isBlocked()){
         blockedMessage();
     } else {
-        $message = Bot::message();  
+        $message = Bot::message();
+        
+        $self['parse_mode'] = 'markdown';
+        $data['parse_mode'] = 'markdown';
+        
         $db = new SQLite3("users.db");
         
         $id = $message['from']['id'];
@@ -95,23 +101,27 @@ function stop($params = 0){
                 $self['parse_mode'] = 'markdown';
                 Bot::sendMessage("_You stopped the dialog. Searching for a new partner..._", $self);
             } else {
-                Bot::sendMessage("You stopped the dialog 🙄 \nType /search to find a new partner");
+                Bot::sendMessage("_You stopped the dialog 🙄 \nType /search to find a new partner_", $self);
             }
-            Bot::sendMessage("Your partner has stopped the dialog 😞 \nType /search to find a new partner", $data);
+            Bot::sendMessage("_Your partner has stopped the dialog 😞 \nType /search to find a new partner_", $data);
         }
         if($params < 1 and $companion < 1){
             $db->query("update users set status = 0, companion = 0 where id = {$id}");
-            Bot::sendMessage("You have no partner 🤔 \nType /search to find a new partner");
+            Bot::sendMessage("_You have no partner 🤔 \nType /search to find a new partner_", $self);
         }
     }
     return 0;
 }
 
 function search($params = 0){
-    if(is_blocked()){
+    if(isBlocked()){
         blockedMessage();
     } else {
         $message = Bot::message();
+        
+        $self['parse_mode'] = 'markdown';
+        $data['parse_mode'] = 'markdown';
+        
         $db = new SQLite3("users.db");
         
         $id = $message['from']['id'];
@@ -126,22 +136,22 @@ function search($params = 0){
                 $db->query("update users set status = 2, companion = {$companion} where id = {$id}");
                 $db->query("update users set status = 2, companion = {$id} where id = {$companion}");
                 
-                Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog");
-                Bot::sendMessage("Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog", $data);
+                Bot::sendMessage("_Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog_", $self);
+                Bot::sendMessage("_Partner found 🐵 \n/next — find a new partner \n/stop — stop this dialog_", $data);
             }
             if($params < 1 and $companion < 1){
                 $self['parse_mode'] = 'markdown';
-                Bot::sendMessage("Looking for a partner...", $self);
+                Bot::sendMessage("_Looking for a partner..._", $self);
             }
         } else {
-            Bot::sendMessage("You are in the dialog right now 🤔 \n/next — find a new partner \n/stop — stop this dialog");
+            Bot::sendMessage("_You are in the dialog right now 🤔 \n/next — find a new partner \n/stop — stop this dialog_", $self);
         }
     }
     return 0;
 }
 
 $bot->cmd('*', function($text){
-    if(is_blocked()){
+    if(isBlocked()){
         blockedMessage();
     } else {
         $message = Bot::message();
@@ -160,7 +170,7 @@ $bot->cmd('*', function($text){
 });
 
 $bot->on('*', function($message){
-    if(is_blocked()){
+    if(isBlocked()){
         blockedMessage();
     } else {
         $message = Bot::message();
