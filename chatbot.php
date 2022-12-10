@@ -28,7 +28,7 @@ $bot->cmd('/stop', function() {
 $bot->cmd('/help', function() {
     $data['parse_mode'] = 'markdown';
     $data['disable_web_page_preview'] = true;
-    Bot::sendMessage("This bot is for anonymous chatting with strangers in Telegram. Bot can send text, stickers \nDo not use this bot for criminals! Buy me a coffee (Neobank), 5859459153969695");
+    Bot::sendMessage("This bot is for anonymous chatting with strangers in Telegram. Bot can send text, stickers \nDo not use this bot for criminals! Buy me a coffee 5859459153969695");
     Bot::sendMessage("_source code: (https://github.com/Hukiooi/chatbot3)_", $data);
     
     return 0;
