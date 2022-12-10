@@ -39,7 +39,7 @@ $bot->cmd('/setting', function() {
     return 0;
 });
 
-function is_bloked(){
+function is_blocked(){
     $message = Bot::message();
     $id = $message['from']['id'];
     
