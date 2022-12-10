@@ -26,9 +26,9 @@ $bot->cmd('/stop', function() {
 });
 
 $bot->cmd('/help', function() {
-    $data = array();
-    $data['parse_mode'] = "markdown";
+    $data['parse_mode'] = 'markdown';
     $data['disable_web_page_preview'] = true;
+    Bot::sendMessage("Do not use this bot for criminals! Buy me a coffee (Neobank), 5859459153969695");
     Bot::sendMessage("_source code: (https://github.com/Hukiooi/chatbot3)_", $data);
     return 0;
 });
@@ -73,6 +73,7 @@ function stop($params = 0){
         Bot::sendMessage("Your partner has stopped the dialog 😞 \nType /search to find a new partner", $data);
     }
     if($params < 1 and $companion < 1){
+        $db->query("update users set status = 0, companion = 0 where id = {$id}");
         Bot::sendMessage("You have no partner 🤔 \nType /search to find a new partner");
     }
     return 0;
